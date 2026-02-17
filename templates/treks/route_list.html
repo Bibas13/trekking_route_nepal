@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% block title %}All Trekking Routes - Nepal Trek Explorer{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-hero {
+        background: linear-gradient(135deg, #1A3D2B 0%, #C0392B 100%);
+        padding: 4rem 2rem;
+        text-align: center;
+        color: #fff;
+    }
+    .page-hero h1 { font-size: clamp(2rem, 5vw, 3.5rem); margin-bottom: 0.5rem; }
+    .page-hero p { color: rgba(255,255,255,0.8); font-size: 1.05rem; }
+
+    .search-filters {
+        background: #fff;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: var(--shadow);
+        margin-bottom: 2.5rem;
+    }
+    .search-row { display:flex; gap:1rem; flex-wrap:wrap; }
+    .search-input-wrap { flex:2; min-width:220px; position:relative; }
+    .search-input-wrap input {
+        width:100%; padding:0.75rem 1rem 0.75rem 3rem;
+        border:2px solid #E5E7EB; border-radius:10px; font-size:0.95rem;
+    }
+    .search-input-wrap input:focus { border-color:var(--forest-light); outline:none; }
+    .search-icon { position:absolute; left:1rem; top:50%; transform:translateY(-50%); color:var(--warm-grey); font-size:1.1rem; }
+    .filter-select { flex:1; min-width:140px; }
+    .filter-select select { width:100%; padding:0.75rem 1rem; border:2px solid #E5E7EB; border-radius:10px; font-size:0.9rem; background:#fff; }
+    .filter-select select:focus { border-color:var(--forest-light); outline:none; }
+
+    .results-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; }
+    .results-count { font-size:0.9rem; color:var(--warm-grey); }
+
+    .trek-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:1.75rem; }
+    .trek-card-body { padding:1.5rem; }
+    .trek-card-body h3 { font-size:1.15rem; color:var(--forest); margin-bottom:0.4rem; }
+    .trek-meta { display:flex; gap:0.75rem; flex-wrap:wrap; font-size:0.8rem; color:var(--warm-grey); margin:0.6rem 0; }
+    .trek-footer { display:flex; align-items:center; justify-content:space-between; margin-top:1rem; border-top:1px solid #f0f0f0; padding-top:1rem; }
+    .price { font-family:'Playfair Display',serif; font-size:1.3rem; color:var(--crimson); }
+
+    .active-filters { display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:1rem; }
+    .filter-tag {
+        background: #F0FDF4; border: 1px solid #86EFAC; color: #166534;
+        padding: 0.25rem 0.75rem; border-radius: 50px; font-size: 0.8rem; font-weight: 500;
+    }
+    .trek-card-img {
+        height: 200px;
+        background: linear-gradient(135deg, var(--forest), var(--forest-mid));
+        display: flex; align-items: center; justify-content: center;
+        font-size: 4rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <h1>All Trekking Routes</h1>
+    <p>Browse and filter from our complete collection of Nepal's finest trails</p>
+</section>
+
+<section class="section" style="padding-top:3rem;">
+    <div class="container">
+        <!-- SEARCH & FILTERS -->
+        <form method="get" class="search-filters">
+            <div class="search-row">
+                <div class="search-input-wrap">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" name="q" placeholder="Search routes, regions..." value="{{ query }}">
+                </div>
+                <div class="filter-select">
+                    <select name="province">
+                        <option value="">All Provinces</option>
+                        {% for prov in provinces %}
+                        <option value="{{ prov.pk }}" {% if province_filter == prov.pk|stringformat:"s" %}selected{% endif %}>{{ prov.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="filter-select">
+                    <select name="difficulty">
+                        <option value="">All Levels</option>
+                        {% for val, label in difficulty_choices %}
+                        <option value="{{ val }}" {% if difficulty_filter == val %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="filter-select">
+                    <select name="season">
+                        <option value="">Any Season</option>
+                        {% for val, label in season_choices %}
+                        <option value="{{ val }}" {% if season_filter == val %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="filter-select">
+                    <select name="duration">
+                        <option value="">Any Duration</option>
+                        <option value="1-7" {% if duration_filter == "1-7" %}selected{% endif %}>1–7 days</option>
+                        <option value="8-14" {% if duration_filter == "8-14" %}selected{% endif %}>8–14 days</option>
+                        <option value="15+" {% if duration_filter == "15+" %}selected{% endif %}>15+ days</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-secondary">Search</button>
+            </div>
+            {% if query or province_filter or difficulty_filter or season_filter or duration_filter %}
+            <div class="active-filters">
+                Active filters:
+                {% if query %}<span class="filter-tag">🔍 "{{ query }}"</span>{% endif %}
+                {% if difficulty_filter %}<span class="filter-tag">Level: {{ difficulty_filter }}</span>{% endif %}
+                {% if season_filter %}<span class="filter-tag">Season: {{ season_filter }}</span>{% endif %}
+                {% if duration_filter %}<span class="filter-tag">Duration: {{ duration_filter }}</span>{% endif %}
+                <a href="{% url 'treks:route_list' %}" style="color:var(--crimson); font-size:0.8rem; font-weight:600;">✕ Clear all</a>
+            </div>
+            {% endif %}
+        </form>
+
+        <div class="results-header">
+            <span class="results-count">{{ routes.count }} route{{ routes.count|pluralize }} found</span>
+        </div>
+
+        <div class="trek-grid">
+            {% for route in routes %}
+            <div class="card">
+                <div class="trek-card-img">🏔️</div>
+                <div class="trek-card-body">
+                    <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.5rem;">
+                        <span class="badge badge-{{ route.difficulty }}">{{ route.get_difficulty_display }}</span>
+                        <span style="font-size:0.78rem; color:var(--warm-grey); font-weight:500;">📍 {{ route.province.name }}</span>
+                    </div>
+                    <h3>{{ route.name }}</h3>
+                    <p style="color:#666; font-size:0.85rem; line-height:1.5;">{{ route.short_description|default:route.description|truncatechars:110 }}</p>
+                    <div class="trek-meta">
+                        <span>📅 {{ route.duration_days }} days</span>
+                        <span>🗺️ {{ route.distance_km }} km</span>
+                        <span>⛰️ {{ route.max_altitude }}m</span>
+                        <span>🌤️ {{ route.get_best_season_display }}</span>
+                    </div>
+                    <div class="trek-footer">
+                        <div>
+                            <span class="price">${{ route.price_per_person }}</span>
+                            <span style="font-size:0.75rem; color:var(--warm-grey); margin-left:3px;">/person</span>
+                        </div>
+                        <div style="display:flex; gap:0.5rem;">
+                            <a href="{% url 'treks:route_detail' route.pk %}" class="btn btn-outline" style="padding:0.4rem 0.9rem; font-size:0.82rem;">Details</a>
+                            <a href="{% url 'treks:book_trek' route.pk %}" class="btn btn-primary" style="padding:0.4rem 0.9rem; font-size:0.82rem;">Book</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div style="grid-column:1/-1; text-align:center; padding:5rem 2rem; color:var(--warm-grey);">
+                <div style="font-size:5rem; margin-bottom:1rem;">🏔️</div>
+                <h3 style="font-family:'Playfair Display',serif; color:var(--forest); margin-bottom:0.5rem;">No routes found</h3>
+                <p>Try different search terms or <a href="{% url 'treks:route_list' %}" style="color:var(--crimson);">reset filters</a></p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

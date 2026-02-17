@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+{% block title %}{{ route.name }} - Nepal Trek Explorer{% endblock %}
+
+{% block extra_css %}
+<style>
+    .route-hero {
+        min-height: 55vh;
+        background: linear-gradient(135deg, rgba(26,61,43,0.9) 0%, rgba(192,57,43,0.7) 100%),
+                    linear-gradient(135deg, #1A3D2B, #2D6A4F);
+        display: flex; align-items: center;
+        padding: 4rem 2rem;
+    }
+    .route-hero-inner { max-width: 900px; margin:0 auto; color:#fff; }
+    .route-breadcrumb { font-size:0.85rem; margin-bottom:1rem; opacity:0.8; }
+    .route-breadcrumb a { color:var(--gold); text-decoration:none; }
+    .route-title { font-size: clamp(2rem, 6vw, 3.5rem); margin-bottom:1rem; }
+    .route-badges { display:flex; gap:0.75rem; flex-wrap:wrap; margin-bottom:1.5rem; }
+    .route-quick-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 1rem;
+        background: rgba(255,255,255,0.1);
+        border-radius: 14px;
+        padding: 1.25rem;
+        margin-top: 1.5rem;
+    }
+    .quick-stat { text-align:center; }
+    .quick-stat .val { font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:700; display:block; }
+    .quick-stat .lbl { font-size:0.75rem; opacity:0.75; text-transform:uppercase; letter-spacing:0.5px; }
+
+    .route-layout { display:grid; grid-template-columns:1fr 380px; gap:3rem; }
+    .route-content h2 { font-size:1.5rem; color:var(--forest); margin:2rem 0 1rem; }
+    .route-content p { color:#555; line-height:1.8; }
+    .bullet-list { list-style:none; padding:0; }
+    .bullet-list li { padding:0.5rem 0; padding-left:1.75rem; position:relative; color:#444; font-size:0.92rem; border-bottom:1px solid #F5F5F5; }
+    .bullet-list li::before { content:'✓'; position:absolute; left:0; color:var(--forest-light); font-weight:700; }
+    .bullet-list.exclude li::before { content:'✕'; color:var(--crimson); }
+
+    .booking-card {
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: var(--shadow-lg);
+        padding: 2rem;
+        position: sticky;
+        top: 90px;
+    }
+    .booking-card .price-big { font-family:'Playfair Display',serif; font-size:2.5rem; color:var(--crimson); font-weight:900; }
+    .booking-card .per { font-size:0.9rem; color:var(--warm-grey); }
+    .booking-card-divider { border:none; border-top:1px solid #F0F0F0; margin:1.25rem 0; }
+    .info-row { display:flex; justify-content:space-between; font-size:0.9rem; margin-bottom:0.6rem; }
+    .info-row .key { color:var(--warm-grey); }
+    .info-row .val { font-weight:600; color:var(--charcoal); }
+
+    .related-section { background: var(--stone); padding: 4rem 2rem; }
+    .related-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:1.5rem; }
+
+    @media (max-width:900px) {
+        .route-layout { grid-template-columns:1fr; }
+        .booking-card { position:static; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- HERO -->
+<section class="route-hero">
+    <div class="route-hero-inner">
+        <div class="route-breadcrumb">
+            <a href="{% url 'treks:home' %}">Home</a> ›
+            <a href="{% url 'treks:province_detail' route.province.pk %}">{{ route.province.name }}</a> ›
+            {{ route.name }}
+        </div>
+        <div class="route-badges">
+            <span class="badge badge-{{ route.difficulty }}">{{ route.get_difficulty_display }}</span>
+            <span class="badge" style="background:rgba(212,168,67,0.25); color:var(--gold);">📍 {{ route.province.name }}</span>
+            <span class="badge" style="background:rgba(255,255,255,0.15); color:#fff;">🌤️ {{ route.get_best_season_display }}</span>
+        </div>
+        <h1 class="route-title">{{ route.name }}</h1>
+        <p style="color:rgba(255,255,255,0.85); max-width:620px; font-size:1.05rem;">{{ route.short_description|default:route.description|truncatechars:200 }}</p>
+        <div class="route-quick-stats">
+            <div class="quick-stat">
+                <span class="val">{{ route.duration_days }}</span>
+                <span class="lbl">Days</span>
+            </div>
+            <div class="quick-stat">
+                <span class="val">{{ route.distance_km }}</span>
+                <span class="lbl">Kilometers</span>
+            </div>
+            <div class="quick-stat">
+                <span class="val">{{ route.max_altitude }}m</span>
+                <span class="lbl">Max Altitude</span>
+            </div>
+            <div class="quick-stat">
+                <span class="val">${{ route.price_per_person }}</span>
+                <span class="lbl">Per Person</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- MAIN CONTENT -->
+<section class="section" style="padding-top:3rem;">
+    <div class="container">
+        <div class="route-layout">
+            <!-- LEFT CONTENT -->
+            <div class="route-content">
+                <h2>About This Trek</h2>
+                <p>{{ route.description }}</p>
+
+                {% if route.get_highlights_list %}
+                <h2>🌟 Highlights</h2>
+                <ul class="bullet-list">
+                    {% for h in route.get_highlights_list %}
+                    <li>{{ h }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:2rem; margin-top:2rem;">
+                    {% if route.get_includes_list %}
+                    <div>
+                        <h2>✅ Included</h2>
+                        <ul class="bullet-list">
+                            {% for item in route.get_includes_list %}
+                            <li>{{ item }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    {% if route.get_excludes_list %}
+                    <div>
+                        <h2>❌ Not Included</h2>
+                        <ul class="bullet-list exclude">
+                            {% for item in route.get_excludes_list %}
+                            <li>{{ item }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <h2>🗺️ Route Details</h2>
+                <div style="background:var(--stone); border-radius:12px; padding:1.5rem; display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                    <div>
+                        <div style="font-size:0.8rem; color:var(--warm-grey); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:0.25rem;">Start Point</div>
+                        <div style="font-weight:600;">📍 {{ route.start_point }}</div>
+                    </div>
+                    <div>
+                        <div style="font-size:0.8rem; color:var(--warm-grey); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:0.25rem;">End Point</div>
+                        <div style="font-weight:600;">🏁 {{ route.end_point }}</div>
+                    </div>
+                    <div>
+                        <div style="font-size:0.8rem; color:var(--warm-grey); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:0.25rem;">Best Season</div>
+                        <div style="font-weight:600;">🌤️ {{ route.get_best_season_display }}</div>
+                    </div>
+                    <div>
+                        <div style="font-size:0.8rem; color:var(--warm-grey); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:0.25rem;">Province</div>
+                        <div style="font-weight:600;">🏔️ {{ route.province.name }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOOKING SIDEBAR -->
+            <div>
+                <div class="booking-card">
+                    <div class="price-big">${{ route.price_per_person }}</div>
+                    <div class="per">per person</div>
+                    <hr class="booking-card-divider">
+                    <div class="info-row"><span class="key">Duration</span><span class="val">{{ route.duration_days }} days</span></div>
+                    <div class="info-row"><span class="key">Distance</span><span class="val">{{ route.distance_km }} km</span></div>
+                    <div class="info-row"><span class="key">Max Altitude</span><span class="val">{{ route.max_altitude }}m</span></div>
+                    <div class="info-row"><span class="key">Difficulty</span><span class="val">{{ route.get_difficulty_display }}</span></div>
+                    <div class="info-row"><span class="key">Best Season</span><span class="val">{{ route.get_best_season_display }}</span></div>
+                    <hr class="booking-card-divider">
+                    <a href="{% url 'treks:book_trek' route.pk %}" class="btn btn-primary" style="width:100%; text-align:center; display:block; font-size:1.1rem; padding:1rem;">Book This Trek</a>
+                    <p style="font-size:0.78rem; color:var(--warm-grey); text-align:center; margin-top:0.75rem;">🔒 Secure booking · Free cancellation</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- RELATED ROUTES -->
+{% if related_routes %}
+<section class="related-section">
+    <div class="container">
+        <div class="section-header">
+            <h2>More Treks in {{ route.province.name }}</h2>
+        </div>
+        <div class="related-grid">
+            {% for related in related_routes %}
+            <a href="{% url 'treks:route_detail' related.pk %}" class="card" style="text-decoration:none; color:inherit;">
+                <div style="height:160px; background:linear-gradient(135deg, var(--forest), var(--forest-mid)); display:flex;align-items:center;justify-content:center;font-size:3rem;">🏔️</div>
+                <div style="padding:1.25rem;">
+                    <span class="badge badge-{{ related.difficulty }}" style="margin-bottom:0.5rem; display:inline-block;">{{ related.get_difficulty_display }}</span>
+                    <h3 style="font-size:1.1rem; color:var(--forest); margin-bottom:0.4rem;">{{ related.name }}</h3>
+                    <div style="display:flex; justify-content:space-between; font-size:0.85rem; color:var(--warm-grey);">
+                        <span>{{ related.duration_days }} days</span>
+                        <span style="font-weight:700; color:var(--crimson);">${{ related.price_per_person }}</span>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

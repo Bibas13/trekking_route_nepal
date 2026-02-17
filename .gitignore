@@ -1,0 +1,18 @@
+.venv/
+venv/
+
+env/
+.env
+
+.idea/
+
+static/
+
+staticfiles/
+
+#for now
+medial/
+
+
+
+

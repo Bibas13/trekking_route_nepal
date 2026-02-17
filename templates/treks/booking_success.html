@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Booking Confirmed - Nepal Trek Explorer{% endblock %}
+{% block extra_css %}
+<style>
+.success-page { min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 3rem 2rem; background: var(--stone); }
+.success-card { background: #fff; border-radius: 24px; box-shadow: var(--shadow-lg); padding: 3rem; max-width: 600px; width: 100%; text-align: center; }
+.success-icon { font-size: 5rem; margin-bottom: 1.5rem; animation: bounceIn 0.6s; }
+@keyframes bounceIn { 0%{transform:scale(0.5);opacity:0} 70%{transform:scale(1.1)} 100%{transform:scale(1);opacity:1} }
+.ref-badge { background: var(--forest); color: #fff; padding: 0.75rem 2rem; border-radius: 50px; font-family: 'Playfair Display', serif; font-size: 1.5rem; letter-spacing: 2px; display: inline-block; margin: 1.5rem 0; }
+.booking-details { text-align: left; background: var(--stone); border-radius: 14px; padding: 1.5rem; margin: 1.5rem 0; }
+.bd-row { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #E5DFD0; font-size: 0.9rem; }
+.bd-row:last-child { border: none; }
+.bd-key { color: var(--warm-grey); }
+.bd-val { font-weight: 600; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="success-page">
+    <div class="success-card">
+        <div class="success-icon">🎉</div>
+        <h1 style="font-size:2rem; color:var(--forest); margin-bottom:0.5rem;">Booking Confirmed!</h1>
+        <p style="color:var(--warm-grey);">Your trek has been successfully booked. Here is your reference number:</p>
+        <div class="ref-badge">{{ booking.booking_reference }}</div>
+        <p style="font-size:0.85rem; color:var(--warm-grey);">Please save this reference number. We'll send details to <strong>{{ booking.email }}</strong></p>
+        <div class="booking-details">
+            <div class="bd-row"><span class="bd-key">Trek</span><span class="bd-val">{{ booking.route.name }}</span></div>
+            <div class="bd-row"><span class="bd-key">Province</span><span class="bd-val">{{ booking.route.province.name }}</span></div>
+            <div class="bd-row"><span class="bd-key">Trekker Name</span><span class="bd-val">{{ booking.full_name }}</span></div>
+            <div class="bd-row"><span class="bd-key">Start Date</span><span class="bd-val">{{ booking.trek_start_date }}</span></div>
+            <div class="bd-row"><span class="bd-key">End Date</span><span class="bd-val">{{ booking.trek_end_date }}</span></div>
+            <div class="bd-row"><span class="bd-key">Trekkers</span><span class="bd-val">{{ booking.num_trekkers }}</span></div>
+            <div class="bd-row"><span class="bd-key">Guide</span><span class="bd-val">{% if booking.require_guide %}Yes{% else %}No{% endif %}</span></div>
+            <div class="bd-row"><span class="bd-key">Porter</span><span class="bd-val">{% if booking.require_porter %}Yes ({{ booking.num_porters }}){% else %}No{% endif %}</span></div>
+            <div class="bd-row"><span class="bd-key">Estimated Total</span><span class="bd-val" style="color:var(--crimson); font-size:1.1rem;">${{ booking.total_price }}</span></div>
+            <div class="bd-row"><span class="bd-key">Status</span><span class="bd-val" style="color:var(--forest);">⏳ {{ booking.get_status_display }}</span></div>
+        </div>
+        <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+            <a href="{% url 'treks:home' %}" class="btn btn-secondary">Back to Home</a>
+            <a href="{% url 'treks:route_list' %}" class="btn btn-primary">Explore More Treks</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

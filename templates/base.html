@@ -1,0 +1,230 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Nepal Trek Explorer{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --crimson: #C0392B;
+            --crimson-dark: #922B21;
+            --gold: #D4A843;
+            --gold-light: #F0C060;
+            --forest: #1A3D2B;
+            --forest-mid: #2D6A4F;
+            --forest-light: #40916C;
+            --sky: #E8F4F8;
+            --stone: #F5F0E8;
+            --charcoal: #1C1C1C;
+            --warm-grey: #8B7355;
+            --off-white: #FAFAF7;
+            --shadow: 0 4px 24px rgba(0,0,0,0.12);
+            --shadow-lg: 0 12px 48px rgba(0,0,0,0.18);
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--off-white);
+            color: var(--charcoal);
+            line-height: 1.7;
+        }
+
+        /* NAVBAR */
+        nav {
+            background: var(--forest);
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+            height: 70px;
+        }
+        .nav-logo {
+            font-family: 'Playfair Display', serif;
+            color: var(--gold);
+            font-size: 1.5rem;
+            font-weight: 900;
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+        .nav-logo span { color: #fff; }
+        .nav-links { display: flex; align-items: center; gap: 0.5rem; }
+        .nav-links a {
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .nav-links a:hover { background: rgba(255,255,255,0.12); color: #fff; }
+        .nav-btn {
+            background: var(--crimson) !important;
+            color: #fff !important;
+            padding: 0.4rem 1.2rem !important;
+            font-weight: 600 !important;
+        }
+        .nav-btn:hover { background: var(--crimson-dark) !important; }
+
+        /* MESSAGES */
+        .messages { padding: 1rem 2rem 0; }
+        .alert {
+            padding: 0.9rem 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+            font-size: 0.92rem;
+            font-weight: 500;
+        }
+        .alert-success { background: #D1FAE5; color: #065F46; border-left: 4px solid #10B981; }
+        .alert-error { background: #FEE2E2; color: #991B1B; border-left: 4px solid #EF4444; }
+        .alert-info { background: #DBEAFE; color: #1E40AF; border-left: 4px solid #3B82F6; }
+
+        /* MAIN */
+        main { min-height: calc(100vh - 140px); }
+
+        /* TYPOGRAPHY */
+        h1, h2, h3, h4 { font-family: 'Playfair Display', serif; line-height: 1.25; }
+
+        /* BUTTONS */
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: all 0.25s;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .btn-primary { background: var(--crimson); color: #fff; }
+        .btn-primary:hover { background: var(--crimson-dark); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(192,57,43,0.35); }
+        .btn-secondary { background: var(--forest); color: #fff; }
+        .btn-secondary:hover { background: var(--forest-mid); transform: translateY(-1px); }
+        .btn-outline { background: transparent; color: var(--forest); border: 2px solid var(--forest); }
+        .btn-outline:hover { background: var(--forest); color: #fff; }
+        .btn-gold { background: var(--gold); color: #fff; }
+        .btn-gold:hover { background: var(--gold-light); color: var(--charcoal); transform: translateY(-1px); }
+
+        /* CARDS */
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
+
+        /* BADGES */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .badge-easy { background: #D1FAE5; color: #065F46; }
+        .badge-moderate { background: #FEF3C7; color: #92400E; }
+        .badge-hard { background: #FEE2E2; color: #991B1B; }
+        .badge-extreme { background: #1C1C1C; color: #fff; }
+
+        /* SECTION */
+        .section { padding: 5rem 2rem; }
+        .section-header { text-align: center; margin-bottom: 3rem; }
+        .section-header h2 { font-size: 2.5rem; color: var(--forest); margin-bottom: 0.75rem; }
+        .section-header p { color: var(--warm-grey); font-size: 1.1rem; max-width: 600px; margin: 0 auto; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+
+        /* FOOTER */
+        footer {
+            background: var(--forest);
+            color: rgba(255,255,255,0.8);
+            text-align: center;
+            padding: 2rem;
+            font-size: 0.9rem;
+            margin-top: 4rem;
+        }
+        footer a { color: var(--gold); text-decoration: none; }
+
+        /* FORMS */
+        .form-group { margin-bottom: 1.25rem; }
+        .form-group label { display: block; margin-bottom: 0.4rem; font-weight: 600; font-size: 0.9rem; color: var(--charcoal); }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #E5E7EB;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-family: 'DM Sans', sans-serif;
+            transition: border-color 0.2s;
+            background: #fff;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--forest-light);
+        }
+        .form-group input[type="checkbox"] { width: auto; margin-right: 0.5rem; }
+        .errorlist { color: var(--crimson); font-size: 0.82rem; margin-top: 0.3rem; list-style: none; }
+
+        /* GRID */
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2rem; }
+        .grid-4 { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.5rem; }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            nav { padding: 0 1rem; }
+            .nav-links a { padding: 0.4rem 0.6rem; font-size: 0.82rem; }
+            .section { padding: 3rem 1rem; }
+            .section-header h2 { font-size: 1.8rem; }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <nav>
+        <a href="{% url 'treks:home' %}" class="nav-logo">Nepal<span>Trek</span></a>
+        <div class="nav-links">
+            <a href="{% url 'treks:province_list' %}">Provinces</a>
+            <a href="{% url 'treks:route_list' %}">All Treks</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'treks:my_bookings' %}">My Bookings</a>
+                <a href="/admin/" >Admin</a>
+                <a href="{% url 'logout' %}" class="btn-btn">Logout ({{ user.first_name|default:user.username }})</a>
+            {% else %}
+                <a href="{% url 'login' %}">Login</a>
+                <a href="{% url 'treks:register' %}" class="btn nav-btn">Register</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <main>{% block content %}{% endblock %}</main>
+
+    <footer>
+        <p>🏔️ Nepal Trek Explorer &mdash; Discover the Himalayas, Province by Province</p>
+        <p style="margin-top:0.5rem; font-size:0.8rem; opacity:0.6">
+            &copy; 2024 Nepal Trek Explorer. Built with Django &amp; ❤️ for the mountains.
+        </p>
+    </footer>
+</body>
+</html>

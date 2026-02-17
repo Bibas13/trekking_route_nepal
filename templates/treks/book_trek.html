@@ -1,0 +1,253 @@
+{% extends 'base.html' %}
+{% block title %}Book {{ route.name }} - Nepal Trek Explorer{% endblock %}
+
+{% block extra_css %}
+<style>
+    .booking-hero {
+        background: linear-gradient(135deg, var(--forest) 0%, var(--forest-mid) 100%);
+        padding: 4rem 2rem;
+        color: #fff;
+        text-align: center;
+    }
+    .booking-hero h1 { font-size: clamp(1.8rem, 5vw, 3rem); margin-bottom: 0.5rem; }
+    .booking-hero p { color: rgba(255,255,255,0.8); }
+
+    .booking-layout { display: grid; grid-template-columns: 1fr 380px; gap: 3rem; }
+
+    .booking-form-card {
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+    .form-section { padding: 2rem; border-bottom: 1px solid #F5F5F5; }
+    .form-section:last-child { border-bottom: none; }
+    .form-section-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.2rem;
+        color: var(--forest);
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid var(--stone);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .checkbox-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.9rem 1rem;
+        background: var(--stone);
+        border-radius: 10px;
+        cursor: pointer;
+        transition: background 0.2s;
+        margin-bottom: 0.75rem;
+    }
+    .checkbox-row:hover { background: #EDE9DC; }
+    .checkbox-row input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; accent-color: var(--forest); }
+    .checkbox-label { font-weight: 500; }
+    .checkbox-sub { font-size: 0.8rem; color: var(--warm-grey); display:block; }
+
+    /* ROUTE SUMMARY SIDEBAR */
+    .route-summary {
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: var(--shadow);
+        padding: 2rem;
+        position: sticky;
+        top: 90px;
+    }
+    .route-summary h3 { font-size:1.1rem; color:var(--warm-grey); font-family:'DM Sans',sans-serif; font-weight:500; margin-bottom:0.25rem; }
+    .route-summary h2 { font-size:1.5rem; color:var(--forest); margin-bottom:1.25rem; }
+    .summary-row { display:flex; justify-content:space-between; font-size:0.9rem; margin-bottom:0.6rem; padding-bottom:0.6rem; border-bottom:1px solid #F5F5F5; }
+    .summary-row:last-child { border:none; }
+    .summary-key { color:var(--warm-grey); }
+    .summary-val { font-weight:600; }
+    .price-total { background:var(--forest); color:#fff; padding:1.25rem; border-radius:12px; text-align:center; margin-top:1rem; }
+    .price-total .amt { font-family:'Playfair Display',serif; font-size:2rem; }
+    .price-total .note { font-size:0.8rem; opacity:0.8; margin-top:0.25rem; }
+
+    .form-submit-btn { width:100%; padding:1.1rem; font-size:1.1rem; }
+
+    .helptext { font-size:0.78rem; color:var(--warm-grey); margin-top:0.3rem; }
+
+    @media (max-width: 900px) {
+        .booking-layout { grid-template-columns: 1fr; }
+        .route-summary { position: static; }
+        .form-row { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="booking-hero">
+    <h1>Book Your Trek</h1>
+    <p>Fill in your details below to reserve your spot on <strong>{{ route.name }}</strong></p>
+</section>
+
+<section class="section" style="padding-top:3rem;">
+    <div class="container">
+        <div class="booking-layout">
+            <!-- FORM -->
+            <div>
+                <form method="post" class="booking-form-card">
+                    {% csrf_token %}
+
+                    <!-- PERSONAL INFO -->
+                    <div class="form-section">
+                        <div class="form-section-title">👤 Personal Information</div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>{{ form.full_name.label }}</label>
+                                {{ form.full_name }}
+                                {% if form.full_name.errors %}<ul class="errorlist">{% for e in form.full_name.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label>{{ form.nationality.label }}</label>
+                                {{ form.nationality }}
+                                {% if form.nationality.errors %}<ul class="errorlist">{% for e in form.nationality.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>{{ form.email.label }}</label>
+                                {{ form.email }}
+                                {% if form.email.errors %}<ul class="errorlist">{% for e in form.email.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label>{{ form.phone.label }}</label>
+                                {{ form.phone }}
+                                {% if form.phone.errors %}<ul class="errorlist">{% for e in form.phone.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TREK DATES -->
+                    <div class="form-section">
+                        <div class="form-section-title">📅 Trek Dates & Group</div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>{{ form.trek_start_date.label }}</label>
+                                {{ form.trek_start_date }}
+                                {% if form.trek_start_date.errors %}<ul class="errorlist">{% for e in form.trek_start_date.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label>{{ form.trek_end_date.label }}</label>
+                                {{ form.trek_end_date }}
+                                {% if form.trek_end_date.errors %}<ul class="errorlist">{% for e in form.trek_end_date.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>{{ form.num_trekkers.label }}</label>
+                            {{ form.num_trekkers }}
+                            <p class="helptext">Min 1, Max 50 trekkers per booking</p>
+                        </div>
+                    </div>
+
+                    <!-- GUIDE & PORTER -->
+                    <div class="form-section">
+                        <div class="form-section-title">🧗 Guide & Porter Services</div>
+                        <label class="checkbox-row">
+                            {{ form.require_guide }}
+                            <div>
+                                <div class="checkbox-label">Request a Licensed Guide</div>
+                                <span class="checkbox-sub">Expert local guides certified by Nepal Tourism Board</span>
+                            </div>
+                        </label>
+                        <label class="checkbox-row">
+                            {{ form.require_porter }}
+                            <div>
+                                <div class="checkbox-label">Request Porter Service</div>
+                                <span class="checkbox-sub">Porters carry up to 25kg of your gear</span>
+                            </div>
+                        </label>
+                        <div class="form-group" style="margin-top:0.75rem;">
+                            <label>{{ form.num_porters.label }}</label>
+                            {{ form.num_porters }}
+                        </div>
+                    </div>
+
+                    <!-- EMERGENCY CONTACT -->
+                    <div class="form-section">
+                        <div class="form-section-title">🚨 Emergency Contact</div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>{{ form.emergency_contact_name.label }}</label>
+                                {{ form.emergency_contact_name }}
+                                {% if form.emergency_contact_name.errors %}<ul class="errorlist">{% for e in form.emergency_contact_name.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label>{{ form.emergency_contact_phone.label }}</label>
+                                {{ form.emergency_contact_phone }}
+                                {% if form.emergency_contact_phone.errors %}<ul class="errorlist">{% for e in form.emergency_contact_phone.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SPECIAL REQUESTS -->
+                    <div class="form-section">
+                        <div class="form-section-title">📝 Special Requests</div>
+                        <div class="form-group">
+                            <label>{{ form.special_requests.label }} <span style="color:var(--warm-grey); font-weight:400;">(optional)</span></label>
+                            {{ form.special_requests }}
+                        </div>
+
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-error">{{ form.non_field_errors }}</div>
+                        {% endif %}
+
+                        <button type="submit" class="btn btn-primary form-submit-btn">Confirm Booking →</button>
+                        <p style="font-size:0.8rem; color:var(--warm-grey); text-align:center; margin-top:0.75rem;">
+                            🔒 Your data is safe · No payment required yet
+                        </p>
+                    </div>
+                </form>
+            </div>
+
+            <!-- SUMMARY SIDEBAR -->
+            <div>
+                <div class="route-summary">
+                    <h3>You're booking</h3>
+                    <h2>{{ route.name }}</h2>
+                    <div class="summary-row">
+                        <span class="summary-key">Province</span>
+                        <span class="summary-val">{{ route.province.name }}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-key">Duration</span>
+                        <span class="summary-val">{{ route.duration_days }} days</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-key">Distance</span>
+                        <span class="summary-val">{{ route.distance_km }} km</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-key">Max Altitude</span>
+                        <span class="summary-val">{{ route.max_altitude }}m</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-key">Difficulty</span>
+                        <span class="summary-val">{{ route.get_difficulty_display }}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-key">Best Season</span>
+                        <span class="summary-val">{{ route.get_best_season_display }}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-key">Start → End</span>
+                        <span class="summary-val" style="text-align:right;">{{ route.start_point }}<br>→ {{ route.end_point }}</span>
+                    </div>
+                    <div class="price-total">
+                        <div style="font-size:0.85rem; opacity:0.8; margin-bottom:0.25rem;">Total Price (estimate)</div>
+                        <div class="amt">${{ route.price_per_person }}</div>
+                        <div class="note">× number of trekkers</div>
+                    </div>
+                    <a href="{% url 'treks:route_detail' route.pk %}" style="display:block; text-align:center; margin-top:1rem; color:var(--forest); font-size:0.85rem; font-weight:600; text-decoration:none;">← Back to Route Details</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

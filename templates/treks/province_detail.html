@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% block title %}{{ province.name }} Treks - Nepal Trek Explorer{% endblock %}
+
+{% block extra_css %}
+<style>
+    .province-hero {
+        padding: 5rem 2rem;
+        background: linear-gradient(135deg, var(--forest) 0%, var(--forest-mid) 100%);
+        color: #fff;
+    }
+    .province-hero-inner { max-width: 900px; margin: 0 auto; }
+    .province-hero .province-name { font-size: clamp(2rem, 6vw, 4rem); color: #fff; margin-bottom: 0.75rem; }
+    .province-hero p { color: rgba(255,255,255,0.85); font-size: 1.05rem; max-width: 650px; }
+    .province-stats { display:flex; gap:2rem; margin-top:2rem; flex-wrap:wrap; }
+    .prov-stat { background:rgba(255,255,255,0.12); border-radius:10px; padding:0.75rem 1.5rem; text-align:center; }
+    .prov-stat .num { font-family:'Playfair Display',serif; font-size:1.5rem; display:block; font-weight:700; }
+    .prov-stat .lbl { font-size:0.75rem; opacity:0.8; text-transform:uppercase; letter-spacing:0.5px; }
+
+    .filter-bar {
+        background: #fff;
+        border-radius: 14px;
+        padding: 1.5rem;
+        box-shadow: var(--shadow);
+        display: flex;
+        gap: 1rem;
+        align-items: flex-end;
+        flex-wrap: wrap;
+        margin-bottom: 2.5rem;
+    }
+    .filter-group { flex:1; min-width:160px; }
+    .filter-group label { display:block; font-size:0.82rem; font-weight:600; margin-bottom:0.4rem; color:var(--warm-grey); text-transform:uppercase; letter-spacing:0.5px; }
+    .filter-group select { width:100%; padding:0.6rem 0.9rem; border:2px solid #E5E7EB; border-radius:8px; font-size:0.9rem; background:#fff; }
+
+    .trek-card-h { display:grid; grid-template-columns:200px 1fr; border-radius:14px; overflow:hidden; background:#fff; box-shadow:var(--shadow); transition:all 0.3s; text-decoration:none; color:inherit; }
+    .trek-card-h:hover { transform:translateY(-3px); box-shadow:var(--shadow-lg); }
+    .trek-card-h-img { background:linear-gradient(135deg, var(--forest), var(--forest-mid)); display:flex; align-items:center; justify-content:center; font-size:4rem; }
+    .trek-card-h-body { padding:1.5rem; }
+    .trek-card-h-body h3 { font-size:1.25rem; color:var(--forest); margin-bottom:0.4rem; }
+    .trek-card-h-meta { display:flex; gap:1rem; flex-wrap:wrap; font-size:0.82rem; color:var(--warm-grey); margin:0.6rem 0; }
+    .trek-card-h-desc { font-size:0.88rem; color:#555; line-height:1.6; margin-bottom:0.75rem; }
+    .trek-card-h-footer { display:flex; align-items:center; justify-content:space-between; }
+    .price-tag { font-family:'Playfair Display',serif; font-size:1.4rem; color:var(--crimson); font-weight:700; }
+
+    .no-results { text-align:center; padding:4rem; color:var(--warm-grey); }
+    @media(max-width:640px) { .trek-card-h { grid-template-columns:1fr; } .trek-card-h-img { height:160px; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="province-hero">
+    <div class="province-hero-inner">
+        <div style="font-size:0.85rem; opacity:0.7; margin-bottom:0.75rem;">
+            <a href="{% url 'treks:home' %}" style="color:var(--gold); text-decoration:none;">Home</a> ›
+            <a href="{% url 'treks:province_list' %}" style="color:var(--gold); text-decoration:none;">Provinces</a> ›
+            {{ province.name }}
+        </div>
+        <h1 class="province-name">{{ province.name }}</h1>
+        {% if province.headquarters %}
+        <p style="color:var(--gold); font-size:0.9rem; margin-bottom:0.5rem;">🏛️ Headquarters: {{ province.headquarters }}</p>
+        {% endif %}
+        <p>{{ province.description|default:"Discover breathtaking trekking routes through the stunning landscapes of this province." }}</p>
+        <div class="province-stats">
+            <div class="prov-stat">
+                <span class="num">{{ routes.count }}</span>
+                <span class="lbl">Trekking Routes</span>
+            </div>
+            <div class="prov-stat">
+                <span class="num">{{ province.code }}</span>
+                <span class="lbl">Province Code</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <!-- FILTER -->
+        <form method="get" class="filter-bar">
+            <div class="filter-group">
+                <label>Difficulty</label>
+                <select name="difficulty">
+                    <option value="">All Levels</option>
+                    {% for val, label in difficulty_choices %}
+                    <option value="{{ val }}" {% if difficulty_filter == val %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Best Season</label>
+                <select name="season">
+                    <option value="">Any Season</option>
+                    {% for val, label in season_choices %}
+                    <option value="{{ val }}" {% if season_filter == val %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-secondary">Filter</button>
+            {% if difficulty_filter or season_filter %}
+            <a href="{% url 'treks:province_detail' province.pk %}" class="btn btn-outline">Clear</a>
+            {% endif %}
+        </form>
+
+        <!-- ROUTES -->
+        <div style="display:flex; flex-direction:column; gap:1.5rem;">
+            {% for route in routes %}
+            <a href="{% url 'treks:route_detail' route.pk %}" class="trek-card-h">
+                <div class="trek-card-h-img">🏔️</div>
+                <div class="trek-card-h-body">
+                    <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.5rem;">
+                        <span class="badge badge-{{ route.difficulty }}">{{ route.get_difficulty_display }}</span>
+                        <span class="badge" style="background:#E8F4F8; color:var(--forest);">{{ route.get_best_season_display }}</span>
+                    </div>
+                    <h3>{{ route.name }}</h3>
+                    <div class="trek-card-h-meta">
+                        <span>📅 {{ route.duration_days }} days</span>
+                        <span>📍 {{ route.distance_km }} km</span>
+                        <span>⛰️ Max {{ route.max_altitude }}m</span>
+                        <span>🚩 {{ route.start_point }} → {{ route.end_point }}</span>
+                    </div>
+                    <p class="trek-card-h-desc">{{ route.short_description|default:route.description|truncatechars:150 }}</p>
+                    <div class="trek-card-h-footer">
+                        <div>
+                            <span class="price-tag">${{ route.price_per_person }}</span>
+                            <span style="font-size:0.8rem; color:var(--warm-grey); margin-left:0.25rem;">per person</span>
+                        </div>
+                        <span class="btn btn-primary" style="padding:0.5rem 1.25rem; font-size:0.85rem;">Book Now</span>
+                    </div>
+                </div>
+            </a>
+            {% empty %}
+            <div class="no-results">
+                <div style="font-size:4rem; margin-bottom:1rem;">🔍</div>
+                <h3 style="font-family:'Playfair Display',serif; margin-bottom:0.5rem;">No routes found</h3>
+                <p>Try adjusting your filters or <a href="{% url 'treks:province_detail' province.pk %}" style="color:var(--crimson);">clear all filters</a></p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
