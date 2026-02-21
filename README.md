@@ -43,50 +43,10 @@ python manage.py createsuperuser
 python manage.py runserver
 
 
-Visit: http://127.0.0.1:8000
-Admin: http://127.0.0.1:8000/admin/
+Visit: http://<host:ip>:8000
+Admin: http://<host:ip>:8000/admin/
 
 ```
-
-
-## Project Structure
-
-nepal_trekking/
-├── manage.py
-├── requirements.txt
-├── nepal_trekking/          # Project settings
-│   ├── settings.py
-│   ├── urls.py
-│   └── wsgi.py
-├── treks/                   # Main app
-│   ├── models.py            # Province, TrekkingRoute, Booking
-│   ├── views.py             # All page views
-│   ├── urls.py              # URL patterns
-│   ├── forms.py             # Booking & registration forms
-│   ├── admin.py             # Admin configuration
-│   └── fixtures/
-│       └── initial_data.json  # Sample data (7 provinces, 8 routes)
-├── templates/
-│   ├── base.html              # Base template with navbar/footer
-│   ├── treks/
-│   │   ├── home.html          # Landing page
-│   │   ├── province_list.html
-│   │   ├── province_detail.html
-│   │   ├── route_list.html    # Search & filter page
-│   │   ├── route_detail.html
-│   │   ├── book_trek.html     # Booking form
-│   │   ├── booking_success.html
-│   │   └── my_bookings.html
-│   └── registration/
-│       ├── login.html
-│       └── register.html
-├── static/
-│   ├── css/
-│   ├── js/
-│   └── images/
-└── media/                     # Uploaded images
-
-
 
 ```
 ## Adding Content via Admin
