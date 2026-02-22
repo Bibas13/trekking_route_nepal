@@ -1,1 +1,1 @@
-web: gunicorn nepal_trekking_routes.wsgi
+web:gunicorn nepal_trekking.wsgi
