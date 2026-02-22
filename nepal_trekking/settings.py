@@ -15,7 +15,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'your-local-dev-secret-key')
 
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.onrender.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'trekking-route-nepal.onrender.com']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
