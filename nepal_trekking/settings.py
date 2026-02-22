@@ -9,7 +9,9 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-nepal-trekking-change-in-production-88684'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'your-local-dev-secret-key')
+
+
 
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
