@@ -1,17 +1,36 @@
-.venv/
-venv/
 
-env/
-.env
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
 
-.idea/
+# Django
+db.sqlite3
+staticfiles/
+media/
 
 static/
 
-staticfiles/
 
-#for now
-medial/
+# Environment
+.env
+venv/
+env/
+.venv/
+
+
+
+
+
+
+.idea/
+
+
+
+
+
+
 
 
 
